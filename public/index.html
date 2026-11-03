@@ -499,8 +499,50 @@
   .sub.on{text-decoration:line-through;opacity:.65;}
   .sub.on .sbox{background:var(--teal);border-color:var(--teal);}
   .field select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);font:inherit;}
+  /* v5 */
+  .hcell{height:34px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:12px;cursor:pointer;}
+  .hcell.on{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:800;}
+  .hcell.fut{opacity:.35;pointer-events:none;}
+  .pcard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius-md);padding:12px 14px;margin-bottom:10px;}
+  .pbar{height:8px;border-radius:6px;background:var(--line);overflow:hidden;margin:8px 0 6px;}
+  .pbar>div{height:100%;border-radius:6px;}
+  .prow{font-size:13.5px;padding:6px 0;border-top:1px solid var(--line);cursor:pointer;color:var(--ink-soft);}
+  .tl{position:relative;margin:0 0 12px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius-md);overflow:hidden;}
+  .tl .hl{position:absolute;right:0;left:0;border-top:1px dashed var(--line);font-size:10.5px;color:var(--ink-faint);padding-right:6px;}
+  .tl .blk{position:absolute;box-sizing:border-box;background:var(--teal-soft);border-right:4px solid var(--teal);border-radius:8px;padding:2px 6px;font-size:12px;overflow:hidden;cursor:pointer;color:var(--ink);}
+  .tl .blk.c{border:1px solid #E5484D;border-right:4px solid #E5484D;}
+  .tl .blk.d{opacity:.55;text-decoration:line-through;}
+  .tlwarn{background:var(--rose-soft);border:1px solid var(--rose);border-radius:12px;padding:8px 12px;font-size:13px;margin:0 0 10px;font-weight:600;}
+
+  /* ===== v6: responsive (mobile < 760 <= tablet < 1024 <= desktop) ===== */
+  .today-cols{display:block;}
+  .seg.days .seg-opt{flex:1;text-align:center;}
+  @media(min-width:760px){
+    #view-today.active,#view-stats.active,#view-tasks.active,#view-calendar.active,#view-plan.active{max-width:none;margin:0;}
+    #view-tasks #taskList,#view-today #todayOverdueList{grid-template-columns:repeat(auto-fill,minmax(320px,1fr));}
+    .today-cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 24px;align-items:start;}
+    #todayAdminList,#todayOtherList{grid-template-columns:1fr;}
+    #planProjects,#planHabits{grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:0 16px;align-items:start;}
+    #planProjects:not([style*="none"]),#planHabits:not([style*="none"]){display:grid;}
+    #planProjects>.quick-add,#planProjects>.empty-state,#planHabits>.quick-add,#planHabits>.empty-state,#planHabits>.overdue-head{grid-column:1/-1;}
+    .cal-grid{max-width:none!important;}
+    .sheet{left:50%;right:auto;top:50%;bottom:auto;width:min(620px,92vw);max-width:none;margin:0;border-radius:22px;padding:26px 28px;transform:translate(-50%,-44%);opacity:0;pointer-events:none;visibility:hidden;max-height:88vh;overflow-y:auto;transition:transform .22s ease,opacity .2s,visibility .2s;}
+    .sheet.show{transform:translate(-50%,-50%);opacity:1;pointer-events:auto;visibility:visible;}
+    .sheet-handle{display:none;}
+  }
+  @media(min-width:1024px){
+    body{background:var(--paper);}
+    #app{max-width:none;margin:0;border:0;border-radius:0;box-shadow:none;min-height:100vh;display:grid;grid-template-columns:230px minmax(0,1fr);grid-template-rows:auto 1fr;overflow:visible;}
+    .bottom-nav{grid-column:1;grid-row:1/3;order:0;position:sticky;top:0;align-self:start;height:100vh;flex-direction:column;justify-content:flex-start;gap:6px;margin:0;max-width:none;width:auto;padding:24px 14px;border:0;border-left:1px solid var(--line);border-radius:0;}
+    .nav-btn{flex:none;justify-content:flex-start;padding:12px 16px;}
+    .nav-btn.active{background:var(--teal-soft);}
+    .topbar{grid-column:2;grid-row:1;border-radius:0;padding:24px 40px 14px;}
+    main{grid-column:2;grid-row:2;flex:none;padding:8px 40px 70px;width:100%;}
+    .fab{left:32px;right:auto;bottom:32px;transform:none;}
+    .toast{bottom:40px;}
+  }
+  @media(min-width:1500px){ main{padding:8px 64px 70px;} #view-tasks #taskList{grid-template-columns:repeat(auto-fill,minmax(380px,1fr));} }
 </style>
-</head>
 <body>
 <div id="app">
 
@@ -535,16 +577,21 @@
         <h2 id="todayTitle"></h2>
         <button class="btn-report" id="btnReport">📋 گزارش امروز</button>
       </div>
+      <button class="btn-report" id="btnTimeline" style="margin:0 0 10px">🕒 نمای زمانی</button>
+      <div id="timeline" style="display:none"></div>
       <div class="overdue-head" id="overdueHead" style="display:none"><div class="task-group-label" id="overdueLabel"></div><button id="overdueMove">انتقال همه به امروز</button></div>
       <div id="todayOverdueList"></div>
+      <div class="today-cols"><div>
       <div class="task-group-label" id="adminLabel"></div>
       <div class="quick-add">
         <input type="text" id="quickAdmin" placeholder="کار ادمینی سریع...">
         <button id="quickAdminBtn">+</button>
       </div>
       <div id="todayAdminList"></div>
+      </div><div>
       <div class="task-group-label" id="otherLabel"></div>
       <div id="todayOtherList"></div>
+      </div></div>
     </section>
 
     <!-- CALENDAR -->
@@ -566,6 +613,13 @@
         <h3 id="calSelLabel"></h3>
         <div id="calSelTasks"></div>
       </div>
+    </section>
+
+    <!-- PLAN: projects + habits -->
+    <section id="view-plan">
+      <div class="chip-row" id="planTabs"></div>
+      <div id="planProjects"></div>
+      <div id="planHabits" style="display:none"></div>
     </section>
 
     <!-- STATS -->
@@ -614,6 +668,10 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>
       <span>تقویم</span>
     </div>
+    <div class="nav-btn" data-view="plan">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2"/></svg>
+      <span>اهداف</span>
+    </div>
     <div class="nav-btn" data-view="stats">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>
       <span>آمار</span>
@@ -641,7 +699,7 @@
   </div>
   <div class="field">
     <label>زیرکارها (هر خط یک مورد، اختیاری)</label>
-    <textarea id="fSubs" rows="3" placeholder="مثلاً&#10;تماس با مشتری&#10;ارسال فایل"></textarea>
+    <div id="fSubList"></div><button type="button" class="btn btn-ghost" id="fSubAdd" style="width:100%;margin-top:4px;">+ زیرکار</button>
   </div>
   <div class="field">
     <label>دسته</label>
@@ -659,9 +717,15 @@
     <label>تاریخ سررسید (اختیاری)</label>
     <input type="date" id="fDate">
   </div>
+  <div class="field" style="display:flex;gap:10px;">
+    <div style="flex:1"><label>ساعت شروع</label><input type="time" id="fStart"></div>
+    <div style="flex:1"><label>مدت</label><select id="fDur"><option value="">—</option><option value="15">۱۵ دقیقه</option><option value="30">۳۰ دقیقه</option><option value="45">۴۵ دقیقه</option><option value="60">۱ ساعت</option><option value="90">۱٫۵ ساعت</option><option value="120">۲ ساعت</option><option value="180">۳ ساعت</option><option value="240">۴ ساعت</option></select></div>
+  </div>
+  <div class="field"><label>پروژه / هدف</label><select id="fProject"></select></div>
   <div class="field" id="fDailyWrap">
     <label for="fRepeat">تکرار</label>
-    <select id="fRepeat"><option value="">بدون تکرار</option><option value="daily">هر روز</option><option value="weekly">هر هفته (همین روز هفته)</option><option value="monthly">هر ماه (همین روز ماه)</option></select>
+    <select id="fRepeat"><option value="">بدون تکرار</option><option value="daily">هر روز</option><option value="weekly">هر هفته (همین روز هفته)</option><option value="monthly">هر ماه (همین روز ماه)</option><option value="weekdays">روزهای مشخص هفته</option></select>
+    <div class="seg days" id="fDaysWrap" style="display:none;margin-top:10px;"><div class="seg-opt" data-d="6">ش</div><div class="seg-opt" data-d="0">ی</div><div class="seg-opt" data-d="1">د</div><div class="seg-opt" data-d="2">س</div><div class="seg-opt" data-d="3">چ</div><div class="seg-opt" data-d="4">پ</div><div class="seg-opt" data-d="5">ج</div></div>
   </div>
   <div class="sheet-actions">
     <button class="btn btn-ghost" id="fDelete" style="display:none;">حذف</button>
@@ -866,6 +930,8 @@
     localStorage.setItem('planner_tasks_v1', JSON.stringify(store.tasks));
     localStorage.setItem('planner_categories_v1', JSON.stringify(store.categories));
     localStorage.setItem('planner_dailies_v1', JSON.stringify(store.dailies));
+    localStorage.setItem('planner_projects_v1', JSON.stringify(store.projects||[]));
+    localStorage.setItem('planner_habits_v1', JSON.stringify(store.habits||[]));
   }
   function catById(id){ return store.categories.find(function(c){return c.id===id;}); }
   function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
@@ -873,6 +939,8 @@
   /* ---- migration: new theme colors, admin category, daily templates ---- */
   store.dailies=(function(){ try{ return JSON.parse(localStorage.getItem('planner_dailies_v1')||'[]'); }catch(e){ return []; } })();
   store.categories.forEach(function(c){ if(OLD2NEW[c.color]) c.color=OLD2NEW[c.color]; });
+  function loadJ(k){ try{ return JSON.parse(localStorage.getItem(k)||'[]'); }catch(e){ return []; } }
+  store.projects=loadJ('planner_projects_v1'); store.habits=loadJ('planner_habits_v1');
   function ensureAdminCat(){
     if(!store.categories.some(function(c){return c.id===ADMIN_ID;})){
       store.categories.push({id:ADMIN_ID,name:'ادمینی',color:'#0E9F8E'});
@@ -897,7 +965,7 @@
   })();
 
   /* ================= Navigation ================= */
-  var views=['tasks','today','calendar','stats'];
+  var views=['tasks','today','calendar','plan','stats'];
   var currentView='today';
   function showView(name){
     views.forEach(function(v){
@@ -910,6 +978,7 @@
     if(name==='today') renderToday();
     if(name==='calendar') renderCalendar();
     if(name==='stats') renderStats();
+    if(name==='plan') renderPlan();
     if(name==='tasks') renderTasks();
   }
   document.querySelectorAll('.nav-btn[data-view]').forEach(function(b){
@@ -974,7 +1043,14 @@
     document.getElementById('fDelete').style.display = existing ? 'block' : 'none';
     document.getElementById('fDailyWrap').style.display = existing ? 'none' : 'block';
     document.getElementById('fRepeat').value = '';
-    document.getElementById('fSubs').value = existing ? (existing.subtasks||[]).map(function(x){return x.t;}).join('\n') : '';
+    document.getElementById('fDaysWrap').style.display='none';
+    document.querySelectorAll('#fDaysWrap .seg-opt').forEach(function(x){x.classList.remove('active');});
+    subRows=(existing&&existing.subtasks||[]).map(function(x){return {t:x.t,done:!!x.done};}); renderSubEditor();
+    document.getElementById('fStart').value=existing&&existing.startTime||'';
+    document.getElementById('fDur').value=existing&&existing.duration?String(existing.duration):'';
+    var ps=document.getElementById('fProject');
+    ps.innerHTML='<option value="">بدون پروژه</option>'+store.projects.map(function(p){return '<option value="'+p.id+'">'+escapeHTML(p.name)+'</option>';}).join('');
+    ps.value=existing&&existing.projectId||'';
     openSheet(sheetTask);
   }
 
@@ -985,24 +1061,24 @@
     if(!title){ document.getElementById('fTitle').focus(); return; }
     var note=document.getElementById('fNote').value.trim();
     var date=document.getElementById('fDate').value;
-    var oldSubs=editingId ? (store.tasks.find(function(x){return x.id===editingId;}).subtasks||[]) : [];
-    var subs=document.getElementById('fSubs').value.split('\n').map(function(x){return x.trim();}).filter(Boolean).map(function(tx){
-      var o=oldSubs.find(function(y){return y.t===tx;}); return {t:tx,done:o?!!o.done:false};
-    });
+    if(!editingId && document.getElementById('fRepeat').value==='weekdays' && !document.querySelector('#fDaysWrap .active')){ toast('حداقل یک روز هفته را انتخاب کن'); return; }
+    var subs=subRows.filter(function(r){return r.t.trim();}).map(function(r){return {t:r.t.trim(),done:!!r.done};});
     if(editingId){
       var t=store.tasks.find(function(x){return x.id===editingId;});
-      t.title=title; t.note=note; t.subtasks=subs; t.categoryId=formCat; t.priority=formPrio; t.dueDate=date||null;
+      t.title=title; t.note=note; t.subtasks=subs; t.categoryId=formCat; t.priority=formPrio; t.dueDate=date||null; applyV5(t);
     } else {
       store.tasks.push({
         id:uid(), title:title, note:note, subtasks:subs, categoryId:formCat,
         priority:formPrio, dueDate:date||null, done:false,
         createdAt:todayISO(), completedAt:null
       });
+      applyV5(store.tasks[store.tasks.length-1]);
       var freq=document.getElementById('fRepeat').value;
+      var wdays=[].slice.call(document.querySelectorAll('#fDaysWrap .active')).map(function(x){return +x.dataset.d;});
       if(freq){
         var did=uid(), nt=store.tasks[store.tasks.length-1];
         var anchor = (freq==='daily') ? todayISO() : (date||todayISO());
-        store.dailies.push({id:did,title:title,note:note,subtasks:subs.map(function(x){return x.t;}),categoryId:formCat,priority:formPrio,freq:freq,anchor:anchor,lastGen:todayISO()});
+        store.dailies.push({id:did,title:title,note:note,subtasks:subs.map(function(x){return x.t;}),categoryId:formCat,priority:formPrio,freq:freq,days:freq==='weekdays'?wdays:undefined,anchor:anchor,lastGen:todayISO()});
         nt.dailyId=did; nt.dueDate = (freq==='daily') ? todayISO() : anchor;
       }
     }
@@ -1023,7 +1099,7 @@
 
   function toggleDone(id){
     var t=store.tasks.find(function(x){return x.id===id;});
-    t.done=!t.done;
+    t.done=!t.done; if(!t.done) t.archived=false;
     t.completedAt = t.done ? todayISO() : null;
     persist();
     renderAll();
@@ -1036,6 +1112,7 @@
     {id:'overdue', label:'عقب‌افتاده'},
     {id:'open', label:'انجام‌نشده'},
     {id:'done', label:'انجام‌شده'},
+    {id:'archive', label:'آرشیو'},
     {id:'all', label:'همه'}
   ];
   (function initFilters(){
@@ -1077,7 +1154,7 @@
         '<div class="task-title">'+escapeHTML(t.title)+'</div>'+
         '<div class="task-meta">'+
           (cat?'<span class="cat-tag"><span class="dot" style="background:'+cat.color+'"></span>'+escapeHTML(cat.name)+'</span>':'')+
-          (dueLabel?'<span class="due-tag '+(overdue?'overdue':'')+'">'+dueLabel+'</span>':'')+
+          (dueLabel?'<span class="due-tag '+(overdue?'overdue':'')+'">'+dueLabel+'</span>':'')+(t.startTime?'<span class="due-tag">🕒 '+faNum(t.startTime)+(t.duration?' · '+faNum(t.duration)+'د':'')+'</span>':'')+(projById(t.projectId)?'<span class="cat-tag">🎯 '+escapeHTML(projById(t.projectId).name)+'</span>':'')+
         '</div>'+
         (t.subtasks&&t.subtasks.length?'<div class="subs">'+t.subtasks.map(function(x,i){return '<div class="sub'+(x.done?' on':'')+'" data-sub="'+t.id+':'+i+'"><span class="sbox"></span>'+escapeHTML(x.t)+'</div>';}).join('')+'</div>':'')+
       '</div>'+
@@ -1091,7 +1168,8 @@
   function renderTasks(){
     var list=document.getElementById('taskList');
     var today=todayISO();
-    var items=store.tasks.slice();
+    var items=store.tasks.slice().filter(function(t){ return activeFilter==='archive' ? t.archived : !t.archived; });
+    document.getElementById('archiveBtn').style.display=activeFilter==='done'?'block':'none';
 
     if(activeFilter==='all') items=items.filter(function(t){return !t.done;});
     if(activeFilter==='today') items=items.filter(function(t){return t.dueDate===today;});
@@ -1435,9 +1513,14 @@
   });
 
   /* ================= Daily recurring tasks ================= */
-  var FREQ_LABEL={daily:'هر روز',weekly:'هر هفته',monthly:'هر ماه'};
+  var FREQ_LABEL={daily:'هر روز',weekly:'هر هفته',monthly:'هر ماه',weekdays:'روزهای انتخابی'};
+  var DAY_FA={6:'ش',0:'ی',1:'د',2:'س',3:'چ',4:'پ',5:'ج'};
+  function freqLabel(d){ var f=d.freq||'daily'; return f==='weekdays' ? [6,0,1,2,3,4,5].filter(function(x){return (d.days||[]).indexOf(x)>-1;}).map(function(x){return DAY_FA[x];}).join('،') : FREQ_LABEL[f]; }
+  document.getElementById('fRepeat').addEventListener('change',function(){ document.getElementById('fDaysWrap').style.display=this.value==='weekdays'?'flex':'none'; });
+  document.querySelectorAll('#fDaysWrap .seg-opt').forEach(function(el){ el.addEventListener('click',function(){ el.classList.toggle('active'); }); });
   function repeatDue(d,today){
     var f=d.freq||'daily'; if(f==='daily') return true;
+    if(f==='weekdays') return (d.days||[]).indexOf(new Date(today+'T12:00:00').getDay())>-1;
     var a=d.anchor||d.lastGen||today;
     if(f==='weekly') return new Date(a+'T12:00:00').getDay()===new Date(today+'T12:00:00').getDay();
     var ja=isoToJalali(a), jt=isoToJalali(today);
@@ -1463,7 +1546,7 @@
       return;
     }
     box.innerHTML=store.dailies.map(function(d){
-      return '<div class="cat-manage-row"><span class="name">'+escapeHTML(d.title)+' · '+(FREQ_LABEL[d.freq||'daily'])+'</span><span class="del" data-ddel="'+d.id+'">حذف</span></div>';
+      return '<div class="cat-manage-row"><span class="name">'+escapeHTML(d.title)+' · '+freqLabel(d)+'</span><span class="del" data-ddel="'+d.id+'">حذف</span></div>';
     }).join('');
     box.querySelectorAll('[data-ddel]').forEach(function(el){
       el.addEventListener('click', function(){
@@ -1712,30 +1795,25 @@
         var gap=0;
         if(cards.length>1){ gap=from>0 ? rects[from].top-rects[from-1].bottom : rects[1].top-rects[0].bottom; if(gap<0||gap>60) gap=10; }
         var step=rects[from].height+gap;
-        var startY=e.clientY, startScroll=window.scrollY, lastY=e.clientY, pid=e.pointerId;
+        var startY=e.clientY, startScroll=window.scrollY, lastY=e.clientY, startX=e.clientX, lastX=e.clientX, pid=e.pointerId;
         try{ h.setPointerCapture(pid); }catch(x){}
         card.classList.add('dragging'); document.body.classList.add('is-dragging');
         function update(){
-          var dy=(lastY-startY)+(window.scrollY-startScroll);
-          card.style.transform='translateY('+dy+'px) scale(1.02)';
-          var center=rects[from].top+rects[from].height/2+dy;
+          var dx=lastX-startX, dy=(lastY-startY)+(window.scrollY-startScroll);
+          card.style.transform='translate('+dx+'px,'+dy+'px) scale(1.02)';
+          var cx=rects[from].left+rects[from].width/2+dx, cy=rects[from].top+rects[from].height/2+dy, best=1e12;
           to=from;
-          for(var i=0;i<cards.length;i++){
-            if(i===from) continue;
-            var mid=rects[i].top+rects[i].height/2;
-            if(i<from && center<mid && i<to) to=i;
-            if(i>from && center>mid && i>to) to=i;
-          }
+          rects.forEach(function(r,i){ var d2=Math.pow(cx-(r.left+r.width/2),2)+Math.pow(cy-(r.top+r.height/2),2); if(d2<best){ best=d2; to=i; } });
           cards.forEach(function(c,i){
             if(i===from) return;
-            var off=0;
-            if(to<from && i>=to && i<from) off=step;
-            if(to>from && i>from && i<=to) off=-step;
+            var k=-1;
+            if(to<from && i>=to && i<from) k=i+1;
+            if(to>from && i>from && i<=to) k=i-1;
             c.style.transition='transform .15s';
-            c.style.transform=off?'translateY('+off+'px)':'';
+            c.style.transform=k<0?'':'translate('+(rects[k].left-rects[i].left)+'px,'+(rects[k].top-rects[i].top)+'px)';
           });
         }
-        function move(ev){ if(ev.pointerId!==pid) return; lastY=ev.clientY; update(); }
+        function move(ev){ if(ev.pointerId!==pid) return; lastY=ev.clientY; lastX=ev.clientX; update(); }
         var timer=setInterval(function(){
           var dy=0;
           if(lastY<110) dy=-12; else if(lastY>window.innerHeight-150) dy=12;
@@ -1787,7 +1865,7 @@
     oHead.style.display=overdue.length?'flex':'none';
     document.getElementById('overdueLabel').textContent='عقب‌افتاده · '+faNum(overdue.length);
     odBox.innerHTML=overdue.map(taskCardHTML).join('');
-    bindCards(odBox);
+    bindCards(odBox); renderTimeline();
     var items=store.tasks.filter(function(t){ return t.dueDate===today || (t.done && t.completedAt===today); });
     var admin=items.filter(function(t){return t.categoryId===ADMIN_ID;}).sort(sortToday);
     var other=items.filter(function(t){return t.categoryId!==ADMIN_ID;}).sort(sortToday);
@@ -1938,12 +2016,157 @@
     e.target.value='';
   });
 
+
+  /* ================= v5: time-blocking, subtasks, archive, projects, habits ================= */
+  var subRows=[];
+  function projById(id){ return id?store.projects.find(function(p){return p.id===id;}):null; }
+  function applyV5(t){
+    t.startTime=document.getElementById('fStart').value||null;
+    t.duration=+document.getElementById('fDur').value||null;
+    t.projectId=document.getElementById('fProject').value||null;
+  }
+  function mkBtn(txt,fn){ var b=document.createElement('button'); b.type='button'; b.textContent=txt; b.style.cssText='border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;width:32px;height:38px;font:inherit;cursor:pointer;flex:0 0 auto;'; b.addEventListener('click',fn); return b; }
+  function renderSubEditor(){
+    var box=document.getElementById('fSubList'); box.innerHTML='';
+    subRows.forEach(function(r,i){
+      var row=document.createElement('div'); row.style.cssText='display:flex;gap:6px;align-items:center;margin-bottom:6px;';
+      var inp=document.createElement('input'); inp.type='text'; inp.value=r.t; inp.placeholder='زیرکار'; inp.style.cssText='flex:1;min-width:0;';
+      inp.addEventListener('input',function(){ r.t=inp.value; });
+      row.appendChild(inp);
+      row.appendChild(mkBtn('↑',function(){ if(i>0){ subRows.splice(i-1,0,subRows.splice(i,1)[0]); renderSubEditor(); } }));
+      row.appendChild(mkBtn('↓',function(){ if(i<subRows.length-1){ subRows.splice(i+1,0,subRows.splice(i,1)[0]); renderSubEditor(); } }));
+      row.appendChild(mkBtn('✕',function(){ subRows.splice(i,1); renderSubEditor(); }));
+      box.appendChild(row);
+    });
+  }
+  document.getElementById('fSubAdd').addEventListener('click',function(){
+    subRows.push({t:'',done:false}); renderSubEditor();
+    var ins=document.querySelectorAll('#fSubList input'); if(ins.length) ins[ins.length-1].focus();
+  });
+
+  /* archive */
+  (function(){
+    var row=document.getElementById('taskFilters'), b=document.createElement('button');
+    b.id='archiveBtn'; b.textContent='📦 آرشیو انجام‌شده‌های قدیمی‌تر از ۷ روز';
+    b.style.cssText='display:none;width:100%;margin:0 0 10px;padding:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;font:inherit;font-weight:700;cursor:pointer;';
+    row.parentNode.insertBefore(b,row.nextSibling);
+    b.addEventListener('click',function(){
+      var lim=isoAdd(todayISO(),-7);
+      var mv=store.tasks.filter(function(t){ return t.done && !t.archived && t.completedAt && t.completedAt<=lim; });
+      if(!mv.length){ toast('کار قدیمی‌ای برای آرشیو نیست'); return; }
+      mv.forEach(function(t){ t.archived=true; }); persist(); renderAll();
+      toastUndo(faNum(mv.length)+' کار آرشیو شد',function(){ mv.forEach(function(t){ t.archived=false; }); persist(); renderAll(); });
+    });
+  })();
+
+  /* timeline */
+  var tlOpen=localStorage.getItem('planner_tl_v1')==='1';
+  function toMin(hm){ var p=hm.split(':'); return (+p[0])*60+(+p[1]); }
+  function fmtMin(m){ return pad(Math.floor(m/60)%24)+':'+pad(m%60); }
+  document.getElementById('btnTimeline').addEventListener('click',function(){ tlOpen=!tlOpen; localStorage.setItem('planner_tl_v1',tlOpen?'1':'0'); renderTimeline(); });
+  function renderTimeline(){
+    var box=document.getElementById('timeline'); box.style.display=tlOpen?'block':'none';
+    document.getElementById('btnTimeline').textContent=tlOpen?'🕒 بستن نمای زمانی':'🕒 نمای زمانی';
+    if(!tlOpen) return;
+    var today=todayISO(), H=46, S=6*60, E=24*60;
+    var it=store.tasks.filter(function(t){ return t.dueDate===today && t.startTime && !t.archived; }).map(function(t){
+      var s0=Math.max(toMin(t.startTime),S); return {t:t,s:s0,e:Math.min(s0+(t.duration||30),E)};
+    }).sort(function(a,b){return a.s-b.s;});
+    if(!it.length){ box.innerHTML='<div class="empty-state" style="padding:14px"><p>کاری با ساعت برای امروز نیست.<br>هنگام افزودن کار، «ساعت شروع» و «مدت» را بگذار.</p></div>'; return; }
+    var warns=[];
+    it.forEach(function(a,i){ a.lane=0; for(var j=0;j<i;j++){ var b=it[j]; if(a.s<b.e){ a.c=b.c=true; warns.push(b.t.title+' ⟷ '+a.t.title); } } });
+    it.forEach(function(a,i){ var used={}; for(var j=0;j<i;j++){ if(a.s<it[j].e) used[it[j].lane]=1; } while(used[a.lane]) a.lane++; });
+    var h='';
+    if(warns.length) h+='<div class="tlwarn">⚠ تداخل زمانی: '+warns.map(escapeHTML).join('، ')+'</div>';
+    h+='<div class="tl" style="height:'+((E-S)/60*H)+'px">';
+    for(var m=S;m<E;m+=60) h+='<div class="hl" style="top:'+((m-S)/60*H)+'px">'+faNum(fmtMin(m))+'</div>';
+    h+='<div style="position:absolute;top:0;bottom:0;right:48px;left:6px;">';
+    it.forEach(function(a){
+      var n=a.c?2:1, w=100/n, l=a.lane%n;
+      h+='<div class="blk'+(a.c?' c':'')+(a.t.done?' d':'')+'" data-edit="'+a.t.id+'" style="top:'+((a.s-S)/60*H)+'px;height:'+Math.max(22,(a.e-a.s)/60*H-2)+'px;right:'+(l*w)+'%;width:'+(w-1)+'%;">'+escapeHTML(a.t.title)+'<br><small>'+faNum(fmtMin(a.s))+' – '+faNum(fmtMin(a.e))+'</small></div>';
+    });
+    h+='</div></div>';
+    box.innerHTML=h;
+    box.querySelectorAll('[data-edit]').forEach(function(el){ el.addEventListener('click',function(){ openTaskForm(store.tasks.find(function(x){return x.id===el.dataset.edit;})); }); });
+  }
+
+  /* plan view: projects + habits */
+  var planTab='projects', habOff=0;
+  (function(){
+    var row=document.getElementById('planTabs');
+    [['projects','🎯 پروژه‌ها'],['habits','🔥 عادت‌ها']].forEach(function(x){
+      var el=document.createElement('div'); el.className='chip'+(x[0]===planTab?' active':''); el.textContent=x[1];
+      el.addEventListener('click',function(){ planTab=x[0]; row.querySelectorAll('.chip').forEach(function(c){c.classList.remove('active');}); el.classList.add('active'); renderPlan(); });
+      row.appendChild(el);
+    });
+  })();
+  function renderPlan(){
+    document.getElementById('planProjects').style.display=planTab==='projects'?'':'none';
+    document.getElementById('planHabits').style.display=planTab==='habits'?'':'none';
+    if(planTab==='projects') renderProjects(); else renderHabits();
+  }
+  var QA='<div class="quick-add"><input type="text" id="@I" placeholder="@P"><button id="@B">+</button></div>';
+  function renderProjects(){
+    var box=document.getElementById('planProjects'), h=QA.replace('@I','newProj').replace('@P','پروژه یا هدف جدید...').replace('@B','newProjBtn');
+    if(!store.projects.length) h+='<div class="empty-state"><div class="big">🎯</div><p>هنوز پروژه‌ای نداری.<br>یک پروژه بساز و موقع افزودن کار، آن را انتخاب کن.</p></div>';
+    store.projects.forEach(function(p){
+      var ts=store.tasks.filter(function(t){return t.projectId===p.id;}), d=ts.filter(function(t){return t.done;}).length, pct=ts.length?Math.round(d/ts.length*100):0;
+      h+='<div class="pcard"><div class="overdue-head"><b>🎯 '+escapeHTML(p.name)+'</b><button data-delp="'+p.id+'">حذف</button></div>'+
+        '<div class="pbar"><div style="width:'+pct+'%;background:'+p.color+'"></div></div>'+
+        '<div style="font-size:12.5px;color:var(--ink-soft);margin-bottom:4px;">'+faNum(d)+' از '+faNum(ts.length)+' کار انجام شده · '+faNum(pct)+'٪</div>'+
+        ts.filter(function(t){return !t.done;}).map(function(t){return '<div class="prow" data-pedit="'+t.id+'">○ '+escapeHTML(t.title)+(t.dueDate?' <small>· '+fmtJ(t.dueDate)+'</small>':'')+'</div>';}).join('')+'</div>';
+    });
+    box.innerHTML=h;
+    function add(){ var i=document.getElementById('newProj'), v=i.value.trim(); if(!v) return; store.projects.push({id:uid(),name:v,color:COLOR_CHOICES[store.projects.length%COLOR_CHOICES.length]}); persist(); renderProjects(); }
+    document.getElementById('newProjBtn').addEventListener('click',add);
+    document.getElementById('newProj').addEventListener('keydown',function(e){ if(e.key==='Enter') add(); });
+    box.querySelectorAll('[data-pedit]').forEach(function(el){ el.addEventListener('click',function(){ openTaskForm(store.tasks.find(function(x){return x.id===el.dataset.pedit;})); }); });
+    box.querySelectorAll('[data-delp]').forEach(function(el){ el.addEventListener('click',function(){
+      if(!confirm('پروژه حذف شود؟ کارهای آن حذف نمی‌شوند.')) return;
+      store.tasks.forEach(function(t){ if(t.projectId===el.dataset.delp) t.projectId=null; });
+      store.projects=store.projects.filter(function(p){return p.id!==el.dataset.delp;}); persist(); renderAll(); renderProjects();
+    }); });
+  }
+  function habStreak(h){ var d=todayISO(); if(!h.log[d]) d=isoAdd(d,-1); var n=0; while(h.log[d]){ n++; d=isoAdd(d,-1); } return n; }
+  function renderHabits(){
+    var box=document.getElementById('planHabits'), today=todayISO(), t0=isoToJalali(today), jy=t0[0], jm=t0[1]+habOff;
+    while(jm<1){ jm+=12; jy--; } while(jm>12){ jm-=12; jy++; }
+    var len=jMonthLen(jy,jm), off=dowOf(jalaliToISO(jy,jm,1));
+    var h='<div class="overdue-head" style="margin-bottom:8px"><button id="habPrev">▶</button><b>'+J_MONTHS[jm-1]+' '+faNum(jy)+'</b><button id="habNext">◀</button></div>'+
+      QA.replace('@I','newHab').replace('@P','عادت جدید (مثلاً مطالعه، ورزش)...').replace('@B','newHabBtn');
+    if(!store.habits.length) h+='<div class="empty-state"><div class="big">🔥</div><p>یک عادت اضافه کن و هر روز تیکش بزن.</p></div>';
+    store.habits.forEach(function(x){
+      var cnt=0, cells='';
+      ['ش','ی','د','س','چ','پ','ج'].forEach(function(n){ cells+='<div style="text-align:center;font-size:11px;color:var(--ink-faint)">'+n+'</div>'; });
+      for(var i=0;i<off;i++) cells+='<div></div>';
+      for(var d=1;d<=len;d++){ var iso=jalaliToISO(jy,jm,d), on=!!x.log[iso]; if(on) cnt++;
+        cells+='<button class="hcell'+(on?' on':'')+(iso>today?' fut':'')+'" data-hab="'+x.id+'" data-iso="'+iso+'">'+faNum(d)+'</button>'; }
+      h+='<div class="pcard"><div class="overdue-head"><b>'+escapeHTML(x.name)+'</b><span style="font-weight:800">🔥 '+faNum(habStreak(x))+' روز</span></div>'+
+        '<div style="font-size:12.5px;color:var(--ink-soft);margin:4px 0 8px">این ماه: '+faNum(cnt)+' از '+faNum(len)+' روز · <a data-delh="'+x.id+'" style="color:var(--rose);cursor:pointer">حذف</a></div>'+
+        '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px">'+cells+'</div></div>';
+    });
+    box.innerHTML=h;
+    document.getElementById('habPrev').addEventListener('click',function(){ habOff--; renderHabits(); });
+    document.getElementById('habNext').addEventListener('click',function(){ if(habOff<0){ habOff++; renderHabits(); } });
+    function add(){ var i=document.getElementById('newHab'), v=i.value.trim(); if(!v) return; store.habits.push({id:uid(),name:v,log:{}}); persist(); renderHabits(); }
+    document.getElementById('newHabBtn').addEventListener('click',add);
+    document.getElementById('newHab').addEventListener('keydown',function(e){ if(e.key==='Enter') add(); });
+    box.querySelectorAll('[data-hab]').forEach(function(el){ el.addEventListener('click',function(){
+      var x=store.habits.find(function(q){return q.id===el.dataset.hab;}); if(x.log[el.dataset.iso]) delete x.log[el.dataset.iso]; else x.log[el.dataset.iso]=1; persist(); renderHabits();
+    }); });
+    box.querySelectorAll('[data-delh]').forEach(function(el){ el.addEventListener('click',function(){
+      if(!confirm('این عادت و سابقه‌اش حذف شود؟')) return;
+      store.habits=store.habits.filter(function(q){return q.id!==el.dataset.delh;}); persist(); renderHabits();
+    }); });
+  }
+
   /* ================= Init ================= */
   function renderAll(){
     document.getElementById('orderBar').style.display=manualOrder()?'block':'none';
     ensureDaily();
     renderToday();
     updateReminder();
+    if(currentView==='plan') renderPlan();
     renderTasks();
     renderCalendar();
     renderStats();
